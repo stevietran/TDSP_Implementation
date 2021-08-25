@@ -1,0 +1,79 @@
+# Main algorithm
+Input: G_T, v_s and v_e, t_d and t_a
+Output: an optimal path p∗ and waiting time w∗(v_i) for every vertex v_i in p∗.
+
+COMPUTE-MINIMUM-COST (G_T, v_s, v_e, td, ta);
+
+if g_e(t_e) is not Inf then:
+    PATH-SELECTION (g_e(t_e), G_T, v_s, v_e, t_d, t_a);
+    return p∗ and w∗(v_i) for every v_i in p∗;
+else
+    return None;
+
+
+# PATH_SELECTION Algorithm:
+
+PATH-SELECTION (G_T, v_s, v_e, t_d, t_a, g_e(t_e))
+
+Input: G_T, g_e(t_e), v_s and v_e, t_d and t_a.
+
+Output: the optimal path p∗ and w∗(v_i) for every vertex v_i in p∗.
+
+v_i(t) <- v_e; p∗ <- None; g_i(t_i) <- g_e(t_e); t_i <- t∗;
+
+while v_i NOT v_s do    
+    for each v_j IN Neighbors(v_i) do
+        if EXIST(t_j) <= t_i − w_{j,i}, g_i(t_i) = g_j (t_j ) + f_{j,i}(t_i − w_{j,i}) then
+            p∗ <- p∗ + v_j; 
+            w∗(v_i) = t_i − w_{j,i} − t_j;
+            v_i <- v_j; 
+            t_i <- t_j;
+            break;
+return p∗ and w∗(v_i) for each v_i IN p∗.
+
+# PATH_SELECTION Algorithm With Capacity Constraint:
+
+PATH-SELECTION (G_T, v_s, v_e, t_d, t_a, g_e(t_e), c_{j,i})
+
+Input: G_T, g_e(t_e), v_s and v_e, t_d, t_a and c_{j,i}.
+
+Output: the optimal path p∗ and w∗(v_i) for every vertex v_i in p∗.
+
+gValue_* <- Sorted(Values(g_e));
+
+FOR gValue IN gValue_*: 
+    t_e = min t: g_e(t) = gValue
+    
+    # Find route for the value as well as waiting time like before (p* and w*(v_i))
+    p*, w*(v_i) = FIND_ROUTE(t_e) # return p∗ and w∗(v_i) for each v_i IN p∗.
+    
+    # Max time change t*
+    t* = intervalOf(t_e, g_e) - t_e # t_e is the min time of the PieceWise function
+    
+    # Capacity function check at departure time for each edge in path
+    # Confirm departure time and update waiting times
+    FOR EACH edge in p*:
+        # Get departure time of the package which satisfies (1) package arrives at the next node within the time frame (2) the edge has enough capacity
+        # calculate origin t_j
+        t_j = t_i - w_{j_i}
+        # get departure time and capacity
+        c_j = c_{j,i}(t_j)
+        t_dj = max t: c_{j,i}(t) = c_j
+
+        if c_j <= 0: # one of the edge has no capacity -> try other path
+            break
+
+        if t_d - t_j <= t*: # the departure is too late for the min cost
+            break
+        
+        # new waiting time w_c*(v_i)
+        w_j = t_dj - t_j + w*(v_j)
+        w_c* += w_j
+    
+    # IF new waiting time has the same size as the old one (pass capacity test) return
+    if len(w_c*) == len(w_c):
+        return w_c*
+
+return Error: No Capacity
+
+
